@@ -10,7 +10,8 @@
   "dependencies": {
     "dropbox": "^10.4.3",
     "expo": "~42.0.1",
-    "expo-auth-session": "~1.5.0",
+    "expo-auth-session": "~3.3.1",
+    "expo-random": "~11.2.0",
     "expo-status-bar": "~1.0.4",
     "expo-web-browser": "^9.2.0",
     "react": "16.13.1",

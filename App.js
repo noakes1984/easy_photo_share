@@ -4,7 +4,7 @@ import { Alert, StyleSheet, View } from "react-native";
 import DropboxComp from "./src/DropboxComp";
 import { authorize } from "react-native-app-auth";
 import * as WebBrowser from "expo-web-browser";
-import { makeRedirectUri, useAuthRequest } from "expo-auth-session";
+import { makeRedirectUri, ResponseType, useAuthRequest } from "expo-auth-session";
 import { Button, Platform } from "react-native";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -14,19 +14,21 @@ const discovery = {
   tokenEndpoint: "https://www.dropbox.com/oauth2/token",
 };
 
-export default function App() {
-  const useProxy = Platform.select({ web: false, default: true });
+const useProxy = Platform.select({ web: false, default: true });
 
+export default function App() {
   const [request, response, promptAsync] = useAuthRequest(
     {
-      clientId: "foz4e43qesa077j",
+      responseType: ResponseType.Token,
+      // clientId: "foz4e43qesa077j",
+      clientId: 'djshvdyxu5i6r8v',
       // There are no scopes so just pass an empty array
       scopes: [],
       // Dropbox doesn't support PKCE
       usePKCE: false,
       // For usage in managed apps using the proxy
       redirectUri: makeRedirectUri({
-        scheme: "http://localhost:3000/",
+        scheme: 'easy-photo-share',
         useProxy
       }),
     },
@@ -35,9 +37,9 @@ export default function App() {
 
   React.useEffect(() => {
     if (response?.type === "success") {
-      const { code } = response.params;
+      const { access_token } = response.params;
+      console.log('access_token', access_token)
     }
-
   }, [response]);
 
   return (
@@ -45,7 +47,7 @@ export default function App() {
       <Button
         title="Login"
         onPress={() => {
-          promptAsync({useProxy});
+          promptAsync({ useProxy });
         }}
       />
     </View>
