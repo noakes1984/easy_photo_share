@@ -1,18 +1,17 @@
 import * as WebBrowser from "expo-web-browser";
 
 import { Button, Platform } from "react-native";
+import React, { useState } from "react";
 import {
   ResponseType,
   makeRedirectUri,
   useAuthRequest,
 } from "expo-auth-session";
 import {StyleSheet, View} from "react-native";
+import { checkForFolder, createSharedLink, getFile, uploadFile } from "./api/req";
 
-import DropboxComp from "./src/DropboxComp";
-import React from "react";
 import { StatusBar } from "expo-status-bar";
 import { authorize } from "react-native-app-auth";
-import { checkForFile } from "./api/req";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -24,6 +23,7 @@ const discovery = {
 const useProxy = Platform.select({ web: false, default: true });
 
 export default function App() {
+  const [ token, setToken ] = useState('')
 
   
   const [request, response, promptAsync] = useAuthRequest(
@@ -55,9 +55,9 @@ export default function App() {
 
   
 
-  function fetchProjects() {
+  function fetchProjects(token) {
     console.log('is this running')
-    return checkForFile()
+    return checkForFolder(token)
       .then((res) => {
       })
       .catch((err) => {
@@ -69,7 +69,7 @@ export default function App() {
     if (response?.type === "success") {
       const { access_token } = response.params;
       console.log("access_token", access_token);
-      fetchProjects()
+      fetchProjects(access_token)
     }
   }, [response]);
 
