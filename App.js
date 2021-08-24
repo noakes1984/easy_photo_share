@@ -4,6 +4,7 @@ import * as WebBrowser from "expo-web-browser";
 
 import {
   Button,
+  Constants,
   FlatList,
   Platform,
   SafeAreaView,
@@ -134,6 +135,13 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <FlatList
+        data={DATA}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        extraData={selectedId}
+        numColumns={3}
+      />  
       <Button
         title="Login"
         onPress={() => {
@@ -146,13 +154,6 @@ export default function App() {
           promptAsync({ useProxy });
         }}
       />
-      <FlatList
-        data={DATA}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        extraData={selectedId}
-        numColumns={3}
-      />
     </SafeAreaView>
   );
 }
@@ -160,13 +161,17 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    justifyContent: "center",
+    paddingTop: 50,
+    backgroundColor: "#ecf0f1",
+    padding: 8,
+  },
+  item: {
+    backgroundColor: "#add8e6",
     alignItems: "center",
     justifyContent: "center",
-  },
-  list: {
-    justifyContent: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flex: 1,
+    margin: 5,
+    height: 100,
   },
 });
