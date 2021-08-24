@@ -28,7 +28,7 @@ export function checkForFolder(token) {
       
     })
     .then(function (response) {
-      console.log("GOOD JOB", response.data);
+      return response.data
     })
     .catch((error) => {
       console.log("Hello", error.response.status);
@@ -119,7 +119,7 @@ export function getfile() {
       method: "POST",
       url: "https://api.dropboxapi.com/2/file_requests/get",
       data: {
-        "id": "oaCAVmEyrqYnkZX9955Y"
+        "id": "id:Kfy8-PsAfPMAAAAAAAAHrA"
     },
       headers: {
         'Authorization' : 'Bearer sl.A28zn2AeITDqa3fm6HubE23s_kEHr4QXVVcBIfRsHVCkPTSA8UN-pqgr2k1i_EJ9xD1mnI3gl5dBzcg4qolJCua9Y54T5JmJ3s4vaInGjqC2yAKkGIdcsLMkF1kc-rGvlML2GVjsHcg',

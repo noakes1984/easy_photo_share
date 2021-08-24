@@ -1,14 +1,29 @@
+import {} from "react-native";
+
 import * as WebBrowser from "expo-web-browser";
 
-import { Button, Platform } from "react-native";
+import {
+  Button,
+  FlatList,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import {
   ResponseType,
   makeRedirectUri,
   useAuthRequest,
 } from "expo-auth-session";
-import {StyleSheet, View} from "react-native";
-import { checkForFolder, createSharedLink, getFile, uploadFile } from "./api/req";
+import {
+  checkForFolder,
+  createSharedLink,
+  getFile,
+  uploadFile,
+} from "./api/req";
 
 import { StatusBar } from "expo-status-bar";
 import { authorize } from "react-native-app-auth";
@@ -21,11 +36,16 @@ const discovery = {
 };
 
 const useProxy = Platform.select({ web: false, default: true });
+const Item = ({ item, onPress, backgroundColor, textColor }) => (
+  <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
+    <Text style={[styles.title, textColor]}>{item.title}</Text>
+  </TouchableOpacity>
+);
 
 export default function App() {
-  const [ token, setToken ] = useState('')
+  const [token, setToken] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
 
-  
   const [request, response, promptAsync] = useAuthRequest(
     {
       responseType: ResponseType.Token,
@@ -53,35 +73,87 @@ export default function App() {
   //   method: "POST"
   // })
 
-  
-
   function fetchProjects(token) {
-    console.log('is this running')
     return checkForFolder(token)
       .then((res) => {
+        console.log("RES: ", res.entries[0].id);
       })
       .catch((err) => {
         console.error(err);
       });
-  };
+  }
 
   React.useEffect(() => {
     if (response?.type === "success") {
       const { access_token } = response.params;
       console.log("access_token", access_token);
-      fetchProjects(access_token)
+      fetchProjects(access_token);
     }
   }, [response]);
 
+  const DATA = [
+    {
+      id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
+      title: "First Item",
+    },
+    {
+      id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
+      title: "Second Item",
+    },
+    {
+      id: "58694a0f-3da1-471f-bd96-145571e29d72",
+      title: "Third Item",
+    },
+    {
+      id: "dfas-c1b1-46c2-aed5-3ad53abb28ba",
+      title: "First Item",
+    },
+    {
+      id: "asdf-c605-48d3-a4f8-fbd91aa97f63",
+      title: "Second Item",
+    },
+    {
+      id: "dasf-3da1-471f-bd96-145571e29d72",
+      title: "Third Item",
+    },
+  ];
+
+  const renderItem = ({ item }) => {
+    const backgroundColor = item.id === selectedId ? "#6e3b6e" : "#f9c2ff";
+    const color = item.id === selectedId ? "white" : "black";
+
+    return (
+      <Item
+        item={item}
+        onPress={() => setSelectedId(item.id)}
+        backgroundColor={{ backgroundColor }}
+        textColor={{ color }}
+      />
+    );
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Button
         title="Login"
         onPress={() => {
           promptAsync({ useProxy });
         }}
       />
-    </View>
+      <Button
+        title="DL"
+        onPress={() => {
+          promptAsync({ useProxy });
+        }}
+      />
+      <FlatList
+        data={DATA}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        extraData={selectedId}
+        numColumns={3}
+      />
+    </SafeAreaView>
   );
 }
 
@@ -91,5 +163,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  list: {
+    justifyContent: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
 });
