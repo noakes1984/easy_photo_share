@@ -13,7 +13,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -24,8 +24,10 @@ import {
 import {
   checkForFolder,
   createSharedLink,
+  downloadFinal,
+  downloadThis,
   getFile,
-  uploadFile,
+  uploadFile
 } from "./api/req";
 
 import { StatusBar } from "expo-status-bar";
@@ -97,34 +99,65 @@ export default function App() {
       setPicArray(pic);
     });
   }
-
-  function fetchProjects(token) {
-    return checkForFolder(token)
+  function getPicture(token) {
+    return getFile(token)
       .then((res) => {
-        parseEntries(res.entries);
+        //console.log("Dis", res);
+        // parseEntries(res.entries);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  function download(token) {
+    return downloadFinal(token)
+      .then((res) => {
+        //console.log("Dis", res);
+        // parseEntries(res.entries);
       })
       .catch((err) => {
         console.error(err);
       });
   }
 
-  React.useEffect(() => {
+  // function dlPic (token){
     
+  //   return setImage(downloadThis(token))
+
+  // }
+
+  function fetchProjects(token) {
+    return checkForFolder(token)
+      .then((res) => {
+        console.log(res.entries);
+        // parseEntries(res.entries);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  
+
+  React.useEffect(() => {
+    if (response?.type === "success") {
+      const { access_token } = response.params;
+      console.log("access_token", access_token);
+      //fetchProjects(access_token);
+      //getPicture(access_token);
+      //download(access_token)
+      //dlPic(access_token)
+      setImage(downloadThis(token))
+    }
     (async () => {
-      if (response?.type === "success") {
-        const { access_token } = response.params;
-        console.log("access_token", access_token);
-        fetchProjects(access_token);
-      }
-      if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
+      if (Platform.OS !== "web") {
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
         }
       }
     })();
   }, [response]);
-
 
   const DATA = [
     {
@@ -177,9 +210,9 @@ export default function App() {
         extraData={selectedId}
         numColumns={3}
       />
-      {image && (
+      {/* {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
-      )}
+      )} */}
 
       <TouchableOpacity onPress={pickImage}>
         <Text>Directly Launch Image Library</Text>

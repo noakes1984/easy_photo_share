@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "buffer": "^6.0.3",
     "dropbox": "^10.4.3",
     "expo": "~42.0.1",
     "expo-auth-session": "~3.3.1",
