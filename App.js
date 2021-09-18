@@ -1,17 +1,19 @@
 import {} from "react-native";
 
+import * as ImagePicker from "expo-image-picker";
 import * as WebBrowser from "expo-web-browser";
 
 import {
   Button,
   Constants,
   FlatList,
+  Image,
   Platform,
   SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -37,15 +39,17 @@ const discovery = {
 };
 
 const useProxy = Platform.select({ web: false, default: true });
-const Item = ({ item, onPress, backgroundColor, textColor }) => (
+const Item = ({ item, onPress, backgroundColor, textColor, image }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, backgroundColor]}>
-    <Text style={[styles.title, textColor]}>{item.title}</Text>
+    <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
   </TouchableOpacity>
 );
 
 export default function App() {
   const [token, setToken] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const [picArray, setPicArray] = useState([]);
+  const [image, setImage] = useState(null);
 
   const [request, response, promptAsync] = useAuthRequest(
     {
@@ -64,6 +68,20 @@ export default function App() {
     },
     discovery
   );
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
 
   // const callFinal = fetch("https://api.dropboxapi.com/2/files/create_folder_v2", {
   //   body: "{"path\\": \\"/Homework/math\\",\\"autorename\\": false}",
@@ -74,10 +92,16 @@ export default function App() {
   //   method: "POST"
   // })
 
+  function parseEntries(data) {
+    data.map((pic, index) => {
+      setPicArray(pic);
+    });
+  }
+
   function fetchProjects(token) {
     return checkForFolder(token)
       .then((res) => {
-        console.log("RES: ", res.entries[0].id);
+        parseEntries(res.entries);
       })
       .catch((err) => {
         console.error(err);
@@ -85,12 +109,22 @@ export default function App() {
   }
 
   React.useEffect(() => {
-    if (response?.type === "success") {
-      const { access_token } = response.params;
-      console.log("access_token", access_token);
-      fetchProjects(access_token);
-    }
+    
+    (async () => {
+      if (response?.type === "success") {
+        const { access_token } = response.params;
+        console.log("access_token", access_token);
+        fetchProjects(access_token);
+      }
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Sorry, we need camera roll permissions to make this work!');
+        }
+      }
+    })();
   }, [response]);
+
 
   const DATA = [
     {
@@ -129,6 +163,7 @@ export default function App() {
         onPress={() => setSelectedId(item.id)}
         backgroundColor={{ backgroundColor }}
         textColor={{ color }}
+        image={image}
       />
     );
   };
@@ -141,7 +176,14 @@ export default function App() {
         keyExtractor={(item) => item.id}
         extraData={selectedId}
         numColumns={3}
-      />  
+      />
+      {image && (
+        <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
+      )}
+
+      <TouchableOpacity onPress={pickImage}>
+        <Text>Directly Launch Image Library</Text>
+      </TouchableOpacity>
       <Button
         title="Login"
         onPress={() => {
