@@ -6,6 +6,7 @@ const ENDPOINTS = {
   list_folder: "/files/list_folder",
   create_shared_link_with_settings: "/sharing/create_shared_link_with_settings",
   upload_file: "/files/upload",
+  get_temporary_link: "/files/get_temporary_link"
 };
 
 export function checkForFolder(token) {
@@ -27,10 +28,75 @@ export function checkForFolder(token) {
     },
   })
     .then(function (response) {
-      return response.data;
+
+      const final = JSON.stringify(response.data)
+      const last = JSON.parse(final).entries
+      // console.log('final: ', JSON.parse(final).entries[0].id)
+      return last;
     })
     .catch((error) => {
-      console.log("Hello", error.response.status);
+      return console.log("Hello", error.response.status);
+    });
+}
+
+
+export function getTemporaryLink(token){
+  // JSON.stringify({"path": "/homework/math/photoaug18"}),
+  // const final = JSON.stringify({ path: '/homework/math/photoaug18' })
+  return axios({
+    method: "POST",
+    url: BASE_URL + ENDPOINTS.get_temporary_link,
+    data: {
+      path: "/homework/math/heycalebhowareyou.txt"
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then(function (response) {
+      //console.log(response)
+
+      const final = JSON.stringify(response.data)
+      const last = JSON.parse(final)
+      console.log('final: ', JSON.parse(final))
+      return last;
+    })
+    .catch((error) => {
+      return console.log("Hello", error.response.status);
+    });
+}
+
+export function createShareableLink(token){
+  console.log(token)
+ 
+  return axios({
+    method: "POST",
+    url: BASE_URL + ENDPOINTS.create_shared_link_with_settings,
+    data: {
+      path: "/homework/math/smallphoto.jpg",
+      settings: {
+        audience: "public",
+        access: "viewer",
+        requested_visibility: "public",
+        allow_download: true
+      }
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+  })
+    .then(function (response) {
+      console.log(response)
+
+      // const final = JSON.stringify(response.data)
+      // const last = JSON.parse(final)
+      // console.log('final: ', JSON.parse(final))
+      return response;
+    })
+    .catch((error) => {
+      return console.log("dis", error.response);
     });
 }
 
@@ -49,7 +115,7 @@ export function createSharedLink() {
     },
     headers: {
       Authorization:
-        "Bearer sl.A28zn2AeITDqa3fm6HubE23s_kEHr4QXVVcBIfRsHVCkPTSA8UN-pqgr2k1i_EJ9xD1mnI3gl5dBzcg4qolJCua9Y54T5JmJ3s4vaInGjqC2yAKkGIdcsLMkF1kc-rGvlML2GVjsHcg",
+        "Bearer sl.A-7QcJDfMIThhqeguUqjTiGSS4DnyDxzzdArNdU4sVo9A0ns6y6_1xMIir_bLzALyDTKET6TuoQlWudefRj_DmED4Fm_d0sV3iF2o8EfplC_lH-qbk70DifxFg70Yy8bYWWa_tQvJhM",
       "Content-Type": "application/json",
     },
   })

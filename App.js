@@ -23,10 +23,12 @@ import {
 } from "expo-auth-session";
 import {
   checkForFolder,
+  createShareableLink,
   createSharedLink,
   downloadFinal,
   downloadThis,
   getFile,
+  getTemporaryLink,
   uploadFile
 } from "./api/req";
 
@@ -64,7 +66,8 @@ export default function App() {
       usePKCE: false,
       // For usage in managed apps using the proxy
       redirectUri: makeRedirectUri({
-        scheme: "easy-photo-share",
+       scheme: "easy-photo-share",
+        // scheme: "easy-share-pic",
         useProxy,
       }),
     },
@@ -94,31 +97,31 @@ export default function App() {
   //   method: "POST"
   // })
 
-  function parseEntries(data) {
-    data.map((pic, index) => {
-      setPicArray(pic);
-    });
-  }
-  function getPicture(token) {
+  // function parseEntries(data) {
+  //   data.map((pic, index) => {
+  //     setPicArray(pic);
+  //   });
+  // }
+  function getFiles(token) {
     return getFile(token)
       .then((res) => {
-        //console.log("Dis", res);
+        console.log("Dis", res);
         // parseEntries(res.entries);
       })
       .catch((err) => {
         console.error(err);
       });
   }
-  function download(token) {
-    return downloadFinal(token)
-      .then((res) => {
-        //console.log("Dis", res);
-        // parseEntries(res.entries);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
+  // function download(token) {
+  //   return downloadFinal(token)
+  //     .then((res) => {
+  //       //console.log("Dis", res);
+  //       // parseEntries(res.entries);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // }
 
   // function dlPic (token){
     
@@ -126,27 +129,42 @@ export default function App() {
 
   // }
 
-  function fetchProjects(token) {
-    return checkForFolder(token)
-      .then((res) => {
-        console.log(res.entries);
-        // parseEntries(res.entries);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  async function createLink(token) {
+    const final = await createShareableLink(token)
+    console.log('HEINZ: ', final)
+       // .then((res) => {
+       //   console.log('entries', res);
+       //   // parseEntries(res.entries);
+       // })
+       // .catch((err) => {
+       //   console.error(err);
+       // });
+   }
+
+  async function fetchProjects(token) {
+   const final = await checkForFolder(token)
+   console.log('HEINZ: ', final)
+      // .then((res) => {
+      //   console.log('entries', res);
+      //   // parseEntries(res.entries);
+      // })
+      // .catch((err) => {
+      //   console.error(err);
+      // });
   }
   
 
   React.useEffect(() => {
     if (response?.type === "success") {
       const { access_token } = response.params;
-      console.log("access_token", access_token);
-      //fetchProjects(access_token);
-      //getPicture(access_token);
+    // console.log("access_token", access_token);
+     // fetchProjects(access_token);
+     createLink(access_token);
+     // getTemporaryLink(access_token)
+      // getPicture(access_token);
       //download(access_token)
       //dlPic(access_token)
-      setImage(downloadThis(token))
+      //setImage(downloadThis(token))
     }
     (async () => {
       if (Platform.OS !== "web") {
@@ -213,7 +231,6 @@ export default function App() {
       {/* {image && (
         <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />
       )} */}
-
       <TouchableOpacity onPress={pickImage}>
         <Text>Directly Launch Image Library</Text>
       </TouchableOpacity>
